@@ -1,7 +1,7 @@
 import React from 'react';
-import MapContainer from '../../map/components/MapContainer';
-import IncidentList from '../../incidents/components/IncidentList';
-import ResourceList from '../../resources/components/ResourceList';
+import MapContainer from '@/modules/map/ui/MapContainer';
+import IncidentList from '@/modules/incidents/ui/IncidentList';
+import ResourceList from '@/modules/resources/ui/ResourceList';
 
 const Dashboard = () => {
   return (

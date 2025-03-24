@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import * as Sentry from '@sentry/browser';
+import { eventBus } from '@/modules/core/events';
+import { events } from '../events';
 
-export function useMap(containerId, options = {}) {
+export function useMapService(containerId, options = {}) {
   const mapInstance = useRef(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [error, setError] = useState(null);
@@ -33,6 +35,20 @@ export function useMap(containerId, options = {}) {
         console.log('Map loaded successfully');
         setMapLoaded(true);
         if (options.onLoad) options.onLoad(map);
+        
+        // Publish map initialized event
+        eventBus.publish(events.MAP_INITIALIZED, { mapId: containerId });
+      });
+
+      // Listen for map moves to publish events
+      map.on('moveend', () => {
+        const center = map.getCenter();
+        const zoom = map.getZoom();
+        eventBus.publish(events.MAP_MOVED, { 
+          center: [center.lng, center.lat], 
+          zoom,
+          bounds: map.getBounds()
+        });
       });
 
       mapInstance.current = map;
@@ -51,9 +67,27 @@ export function useMap(containerId, options = {}) {
     if (!mapInstance.current || !mapLoaded) return null;
     
     try {
-      return new mapboxgl.Marker(options)
+      const marker = new mapboxgl.Marker(options)
         .setLngLat(coordinates)
         .addTo(mapInstance.current);
+        
+      // Handle marker clicks if needed
+      if (options.onClick) {
+        const el = marker.getElement();
+        el.addEventListener('click', () => {
+          // Publish marker clicked event
+          eventBus.publish(events.MARKER_CLICKED, { 
+            coordinates,
+            id: options.id,
+            type: options.type
+          });
+          
+          // Call the provided onClick handler
+          options.onClick(coordinates, options.id, options.type);
+        });
+      }
+      
+      return marker;
     } catch (err) {
       console.error('Error adding marker:', err);
       Sentry.captureException(err);

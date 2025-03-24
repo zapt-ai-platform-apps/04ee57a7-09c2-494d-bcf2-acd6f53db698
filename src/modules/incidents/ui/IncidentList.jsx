@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as Sentry from '@sentry/browser';
 import { format } from 'date-fns';
+import { incidentsApi } from '@/modules/incidents/api';
 
 const IncidentList = () => {
   const [incidents, setIncidents] = useState([]);
@@ -13,42 +14,9 @@ const IncidentList = () => {
         setLoading(true);
         console.log('Fetching incidents...');
         
-        // Mock data for development - in a real app, we'd fetch from an API
-        const mockIncidents = [
-          { 
-            id: 1, 
-            type: 'FIRE', 
-            severity: 'HIGH', 
-            status: 'ACTIVE',
-            location: '123 Main St, New York, NY',
-            createdAt: new Date('2023-10-15T14:30:00'),
-            description: 'Building fire, multiple floors involved',
-            assignedUnits: ['Engine 42', 'Ladder 10', 'Battalion 1']
-          },
-          { 
-            id: 2, 
-            type: 'MEDICAL', 
-            severity: 'MEDIUM', 
-            status: 'ACTIVE',
-            location: '456 Park Ave, Los Angeles, CA',
-            createdAt: new Date('2023-10-15T15:15:00'),
-            description: 'Patient with difficulty breathing',
-            assignedUnits: ['Ambulance 7', 'Engine 12']
-          },
-          { 
-            id: 3, 
-            type: 'POLICE', 
-            severity: 'LOW', 
-            status: 'RESOLVED',
-            location: '789 Lake St, Chicago, IL',
-            createdAt: new Date('2023-10-15T10:45:00'),
-            description: 'Traffic stop, routine investigation',
-            assignedUnits: ['Unit 156']
-          },
-        ];
-        
-        setIncidents(mockIncidents);
-        console.log('Incidents loaded successfully:', mockIncidents);
+        const fetchedIncidents = await incidentsApi.getIncidents();
+        setIncidents(fetchedIncidents);
+        console.log('Incidents loaded successfully:', fetchedIncidents);
       } catch (err) {
         console.error('Error fetching incidents:', err);
         Sentry.captureException(err);

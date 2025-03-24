@@ -5,9 +5,10 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build",
+        "build": "vitest run && vite build",
         "serve": "vite preview",
-        "start": "vite --host"
+        "start": "vite --host",
+        "test": "vitest"
     },
     "dependencies": {
         "@sentry/browser": "^8.41.0",
@@ -16,10 +17,8 @@
         "mapbox-gl": "^2.15.0",
         "react-map-gl": "^7.1.7",
         "zustand": "^4.5.0",
-        "react-hook-form": "^7.51.0",
-        "react-router-dom": "^6.22.3",
         "date-fns": "^2.30.0",
-        "react-icons": "^5.0.1",
+        "zod": "^3.22.4",
         "@zapt/zapt-js": "^1.0.21"
     },
     "devDependencies": {
@@ -28,6 +27,7 @@
         "postcss": "^8.4.47",
         "tailwindcss": "^3.4.13",
         "vite": "^5.4.7",
-        "@sentry/vite-plugin": "^2.23.0"
+        "@sentry/vite-plugin": "^2.23.0",
+        "vitest": "^1.4.0"
     }
 }

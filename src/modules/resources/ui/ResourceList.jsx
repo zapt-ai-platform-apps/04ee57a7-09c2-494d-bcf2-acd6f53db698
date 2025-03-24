@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as Sentry from '@sentry/browser';
+import { resourcesApi } from '@/modules/resources/api';
 
 const ResourceList = () => {
   const [resources, setResources] = useState([]);
@@ -12,48 +13,9 @@ const ResourceList = () => {
         setLoading(true);
         console.log('Fetching resources...');
         
-        // Mock data for development
-        const mockResources = [
-          { 
-            id: 101, 
-            type: 'FIRE_TRUCK', 
-            name: 'Engine 42', 
-            status: 'RESPONDING',
-            currentLocation: 'En route to 123 Main St',
-            personnel: 4,
-            assignedTo: 'Building Fire (ID: 1)'
-          },
-          { 
-            id: 102, 
-            type: 'AMBULANCE', 
-            name: 'Ambulance 7', 
-            status: 'AVAILABLE',
-            currentLocation: 'General Hospital',
-            personnel: 2,
-            assignedTo: 'Medical Emergency (ID: 2)'
-          },
-          { 
-            id: 103, 
-            type: 'POLICE_CAR', 
-            name: 'Unit 156', 
-            status: 'ON_SCENE',
-            currentLocation: '789 Lake St',
-            personnel: 2,
-            assignedTo: 'Resolved (ID: 3)'
-          },
-          { 
-            id: 104, 
-            type: 'HELICOPTER', 
-            name: 'Air Support 1', 
-            status: 'AVAILABLE',
-            currentLocation: 'Central Helipad',
-            personnel: 3,
-            assignedTo: null
-          },
-        ];
-        
-        setResources(mockResources);
-        console.log('Resources loaded successfully:', mockResources);
+        const fetchedResources = await resourcesApi.getResources();
+        setResources(fetchedResources);
+        console.log('Resources loaded successfully:', fetchedResources);
       } catch (err) {
         console.error('Error fetching resources:', err);
         Sentry.captureException(err);

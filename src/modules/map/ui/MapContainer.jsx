@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useMap } from '../hooks/useMap';
 import * as Sentry from '@sentry/browser';
+import mapboxgl from 'mapbox-gl';
+import { useMapService } from '@/modules/map/internal/useMapService';
+import { mapApi } from '@/modules/map/api';
 
 const MapContainer = ({ className }) => {
   const [incidents, setIncidents] = useState([]);
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  const { map, mapLoaded, error, addMarker } = useMap('map-container', {
+  const { map, mapLoaded, error, addMarker } = useMapService('map-container', {
     center: [-98, 39], // Center of the USA
     zoom: 4
   });
@@ -16,22 +18,13 @@ const MapContainer = ({ className }) => {
     const fetchMapData = async () => {
       try {
         setLoading(true);
-        // In a real app, we would fetch real data from the API
-        // For now we'll use mock data
-        const mockIncidents = [
-          { id: 1, type: 'FIRE', coordinates: [-74.006, 40.7128], severity: 'HIGH', title: 'Building Fire' },
-          { id: 2, type: 'MEDICAL', coordinates: [-118.2437, 34.0522], severity: 'MEDIUM', title: 'Medical Emergency' },
-          { id: 3, type: 'POLICE', coordinates: [-87.6298, 41.8781], severity: 'LOW', title: 'Traffic Stop' },
-        ];
         
-        const mockResources = [
-          { id: 101, type: 'FIRE_TRUCK', coordinates: [-74.01, 40.72], status: 'RESPONDING', name: 'Engine 42' },
-          { id: 102, type: 'AMBULANCE', coordinates: [-118.25, 34.06], status: 'AVAILABLE', name: 'Ambulance 7' },
-          { id: 103, type: 'POLICE_CAR', coordinates: [-87.63, 41.88], status: 'ON_SCENE', name: 'Unit 156' },
-        ];
+        // Fetch incidents and resources
+        const fetchedIncidents = await mapApi.getIncidentLocations();
+        const fetchedResources = await mapApi.getResourceLocations();
         
-        setIncidents(mockIncidents);
-        setResources(mockResources);
+        setIncidents(fetchedIncidents);
+        setResources(fetchedResources);
       } catch (err) {
         console.error('Error fetching map data:', err);
         Sentry.captureException(err);
@@ -55,7 +48,14 @@ const MapContainer = ({ className }) => {
         markerElement.style.height = '20px';
         markerElement.style.borderRadius = '50%';
         
-        const marker = addMarker(incident.coordinates, { element: markerElement });
+        const marker = addMarker(incident.coordinates, { 
+          element: markerElement,
+          id: incident.id,
+          type: 'incident',
+          onClick: (coords, id) => {
+            console.log(`Incident ${id} clicked at ${coords}`);
+          }
+        });
         
         // Add popup to marker
         if (marker) {
@@ -82,7 +82,14 @@ const MapContainer = ({ className }) => {
         markerElement.style.height = '15px';
         markerElement.style.borderRadius = '3px';
         
-        const marker = addMarker(resource.coordinates, { element: markerElement });
+        const marker = addMarker(resource.coordinates, { 
+          element: markerElement,
+          id: resource.id,
+          type: 'resource',
+          onClick: (coords, id) => {
+            console.log(`Resource ${id} clicked at ${coords}`);
+          }
+        });
         
         // Add popup to marker
         if (marker) {
