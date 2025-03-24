@@ -1,7 +1,7 @@
 {
-    "name": "reactjs-vite-tailwind-vercel",
+    "name": "sitaw",
     "version": "1.0.0",
-    "description": "ReactJS app with Vite, Tailwind",
+    "description": "Situational awareness tool for emergency and police services",
     "type": "module",
     "scripts": {
         "dev": "vite",
@@ -12,7 +12,15 @@
     "dependencies": {
         "@sentry/browser": "^8.41.0",
         "react": "^18.2.0",
-        "react-dom": "^18.2.0"
+        "react-dom": "^18.2.0",
+        "mapbox-gl": "^2.15.0",
+        "react-map-gl": "^7.1.7",
+        "zustand": "^4.5.0",
+        "react-hook-form": "^7.51.0",
+        "react-router-dom": "^6.22.3",
+        "date-fns": "^2.30.0",
+        "react-icons": "^5.0.1",
+        "@zapt/zapt-js": "^1.0.21"
     },
     "devDependencies": {
         "@vitejs/plugin-react": "^4.3.4",
